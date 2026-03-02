@@ -1,0 +1,32 @@
+{
+  "name": "@mshindi-labs/gsheets",
+  "version": "0.1.0",
+  "description": "Typed Google Sheets & OAuth2 utilities for TypeScript applications",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsup",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "googleapis": "^140.0.1"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  },
+  "keywords": ["google", "sheets", "spreadsheet", "oauth2", "googleapis", "typescript"],
+  "author": "mshindi-labs",
+  "license": "MIT",
+  "engines": { "node": ">=18.0.0" }
+}
