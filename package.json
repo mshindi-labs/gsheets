@@ -22,8 +22,7 @@
     "build": "tsup",
     "prepare": "husky",
     "prepublishOnly": "npm run build",
-    "preversion": "npm run build",
-    "postversion": "git push --follow-tags && npm publish"
+    "release": "semantic-release"
   },
   "dependencies": {
     "googleapis": "^140.0.1"
@@ -32,8 +31,16 @@
     "@commitlint/cli": "^20.4.3",
     "@commitlint/config-conventional": "^20.4.3",
     "@commitlint/types": "^20.4.3",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^12.0.6",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^14.1.0",
+    "conventional-changelog-conventionalcommits": "^9.2.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.3.2",
+    "semantic-release": "^25.0.3",
     "prettier": "^3.4.2",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3"
