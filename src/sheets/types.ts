@@ -1,5 +1,5 @@
-import type { Auth, sheets_v4 } from 'googleapis';
-import type { ErrorResponse, SuccessResponse } from '../common/types.js';
+import type { Auth, sheets_v4 } from "googleapis";
+import type { ErrorResponse, SuccessResponse } from "../common/types.js";
 
 export type GoogleSheetResponse<T> = SuccessResponse<T> | ErrorResponse;
 
@@ -23,7 +23,7 @@ export type GetDataRangeProps = {
   sheetTitle?: string;
   sheetId?: number;
   range: string;
-  valueRenderOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Get['valueRenderOption'];
+  valueRenderOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Get["valueRenderOption"];
 };
 
 export type FindRowsProps = {
@@ -35,15 +35,16 @@ export type FindRowsProps = {
 export type AppendDataProps = {
   sheetTitle: string;
   data: string[][];
-  valueInputOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Append['valueInputOption'];
-  insertDataOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Append['insertDataOption'];
+  range?: string;
+  valueInputOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Append["valueInputOption"];
+  insertDataOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Append["insertDataOption"];
 };
 
 export type UpdateRangeProps = {
   sheetTitle: string;
   range: string; // Format: 'A1', 'B3', 'C1:C10', etc.
   data: string[][];
-  valueInputOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Update['valueInputOption'];
+  valueInputOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Update["valueInputOption"];
 };
 
 export type ReturnColumnRange = {
@@ -78,7 +79,7 @@ export type GoogleSheetRow = {
 export type BatchGetRangesProps = {
   sheetTitle: string;
   ranges: string[];
-  valueRenderOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Get['valueRenderOption'];
+  valueRenderOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Get["valueRenderOption"];
 };
 
 export type BatchUpdateEntry = {
@@ -89,7 +90,7 @@ export type BatchUpdateEntry = {
 export type BatchUpdateRangesProps = {
   sheetTitle: string;
   entries: BatchUpdateEntry[];
-  valueInputOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Update['valueInputOption'];
+  valueInputOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Update["valueInputOption"];
 };
 
 export type BatchClearRangesProps = {
@@ -153,7 +154,7 @@ export type MergeCellsProps = {
   endRowIndex: number;
   startColumnIndex: number;
   endColumnIndex: number;
-  mergeType?: 'MERGE_ALL' | 'MERGE_COLUMNS' | 'MERGE_ROWS';
+  mergeType?: "MERGE_ALL" | "MERGE_COLUMNS" | "MERGE_ROWS";
 };
 
 export type CellFormatProps = {
@@ -178,7 +179,7 @@ export type UpdateCellProps = {
   row: number;
   column: string;
   value: string;
-  valueInputOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Update['valueInputOption'];
+  valueInputOption?: sheets_v4.Params$Resource$Spreadsheets$Values$Update["valueInputOption"];
 };
 
 export type CopyPasteRangeProps = {
@@ -186,7 +187,11 @@ export type CopyPasteRangeProps = {
   sourceRange: string;
   destinationRange: string;
   destinationSheetTitle?: string;
-  pasteType?: 'PASTE_NORMAL' | 'PASTE_VALUES' | 'PASTE_FORMAT' | 'PASTE_FORMULA';
+  pasteType?:
+    | "PASTE_NORMAL"
+    | "PASTE_VALUES"
+    | "PASTE_FORMAT"
+    | "PASTE_FORMULA";
 };
 
 // ---------------------------------------------------------------------------

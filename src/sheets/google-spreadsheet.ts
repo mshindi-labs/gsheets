@@ -1,5 +1,5 @@
-import { google, sheets_v4 } from 'googleapis';
-import type { ErrorResponse } from '../common/types.js';
+import { google, sheets_v4 } from "googleapis";
+import type { ErrorResponse } from "../common/types.js";
 import type {
   AddNamedRangeProps,
   AddSheetProps,
@@ -31,7 +31,7 @@ import type {
   SortRangeProps,
   UpdateCellProps,
   UpdateRangeProps,
-} from './types.js';
+} from "./types.js";
 
 // ---------------------------------------------------------------------------
 // Internal error helpers
@@ -44,7 +44,7 @@ import type {
  * rather than producing "[object Object]".
  */
 function getErrorMessage(error: unknown): string {
-  if (typeof error === 'object' && error !== null && 'message' in error) {
+  if (typeof error === "object" && error !== null && "message" in error) {
     return String((error as { message: unknown }).message);
   }
   return String(error);
@@ -99,7 +99,7 @@ export class GoogleSpreadSheet {
     this.spreadsheetId = spreadsheetId;
     // Instantiate the low-level googleapis client once and reuse it across
     // all method calls to avoid recreating the HTTP transport repeatedly.
-    this.google_sheets = google.sheets({ version: 'v4', auth });
+    this.google_sheets = google.sheets({ version: "v4", auth });
   }
 
   /**
@@ -109,7 +109,7 @@ export class GoogleSpreadSheet {
    */
   private isTruthy(value: unknown): boolean {
     if (value === null || value === undefined) return false;
-    if (typeof value === 'string' && value.trim() === '') return false;
+    if (typeof value === "string" && value.trim() === "") return false;
     return true;
   }
 
@@ -147,7 +147,7 @@ export class GoogleSpreadSheet {
       const response = await this.google_sheets.spreadsheets.get({
         spreadsheetId: this.spreadsheetId,
         // Request only the fields we care about to reduce response payload.
-        fields: 'properties,sheets.properties',
+        fields: "properties,sheets.properties",
       });
 
       if (!response.data) {
@@ -188,7 +188,7 @@ export class GoogleSpreadSheet {
     try {
       const { data: metadata } = await this.google_sheets.spreadsheets.get({
         spreadsheetId: this.spreadsheetId,
-        fields: 'sheets.properties',
+        fields: "sheets.properties",
       });
 
       const tabs: GoogleSheetTab[] =
@@ -230,7 +230,7 @@ export class GoogleSpreadSheet {
       if (!metadata.success) {
         return {
           success: false,
-          problem: 'Unable to retrieve metadata for spreadsheet.',
+          problem: "Unable to retrieve metadata for spreadsheet.",
         };
       }
 
@@ -278,7 +278,7 @@ export class GoogleSpreadSheet {
     if (!sheetTitle && !sheetId) {
       return {
         success: false,
-        problem: 'Either sheetTitle or sheetId must be provided.',
+        problem: "Either sheetTitle or sheetId must be provided.",
       };
     }
 
@@ -312,7 +312,7 @@ export class GoogleSpreadSheet {
       const response = await this.google_sheets.spreadsheets.values.get({
         spreadsheetId: this.spreadsheetId,
         range: `${finalSheetTitle}!${range}`,
-        valueRenderOption: valueRenderOption ?? 'FORMATTED_VALUE',
+        valueRenderOption: valueRenderOption ?? "FORMATTED_VALUE",
       });
 
       if (!response.data) {
@@ -353,7 +353,7 @@ export class GoogleSpreadSheet {
     sheetTitle: string,
     column?: string,
   ): Promise<GoogleSheetResponse<number>> {
-    const range = column ? `${column}:${column}` : 'A:A';
+    const range = column ? `${column}:${column}` : "A:A";
 
     try {
       const response = await this.google_sheets.spreadsheets.values.get({
@@ -392,7 +392,7 @@ export class GoogleSpreadSheet {
   async getRow({
     sheetTitle,
     rowNumber,
-    valueRenderOption = 'UNFORMATTED_VALUE',
+    valueRenderOption = "UNFORMATTED_VALUE",
   }: {
     sheetTitle: string;
     rowNumber: number;
@@ -442,7 +442,7 @@ export class GoogleSpreadSheet {
   async getValuesBySheetTitle(
     sheetTitle: string,
     range: string,
-    valueRenderOption = 'UNFORMATTED_VALUE',
+    valueRenderOption = "UNFORMATTED_VALUE",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<GoogleSheetResponse<any>> {
     try {
@@ -489,7 +489,7 @@ export class GoogleSpreadSheet {
   async getColumnValues(
     sheetTitle: string,
     column: string,
-    valueRenderOption = 'UNFORMATTED_VALUE',
+    valueRenderOption = "UNFORMATTED_VALUE",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<GoogleSheetResponse<any>> {
     return this.getValuesBySheetTitle(
@@ -602,7 +602,7 @@ export class GoogleSpreadSheet {
       requiredDataIndices,
     } = options;
 
-    const _valueRenderOption = valueRenderOption ?? 'UNFORMATTED_VALUE';
+    const _valueRenderOption = valueRenderOption ?? "UNFORMATTED_VALUE";
 
     const response = await this.getColumnValues(
       sheetTitle,
@@ -638,7 +638,10 @@ export class GoogleSpreadSheet {
 
           if (!entryRowResponse.success) return false;
 
-          const entryRowData = (entryRowResponse.data as unknown[][] | null | undefined) ?? [[]];
+          const entryRowData = (entryRowResponse.data as
+            | unknown[][]
+            | null
+            | undefined) ?? [[]];
           const rowData = entryRowData[0] ?? [];
 
           if (!requiredDataIndices) {
@@ -657,9 +660,7 @@ export class GoogleSpreadSheet {
       );
 
       const rowIndices = await Promise.all(getRowIndices);
-      const data = rowIndices.filter(
-        (r): r is GoogleSheetRow => r !== false,
-      );
+      const data = rowIndices.filter((r): r is GoogleSheetRow => r !== false);
 
       return { success: true, data };
     } catch (error) {
@@ -686,6 +687,7 @@ export class GoogleSpreadSheet {
    * @param props - {@link AppendDataProps}
    * @param props.sheetTitle        - Title of the target sheet.
    * @param props.data              - 2-D array of values to append.
+   * @param props.range             - Optional A1 notation range, e.g. `'B2:H'`. Defaults to `'A1'`.
    * @param props.valueInputOption  - `'USER_ENTERED'` (default) or `'RAW'`.
    * @param props.insertDataOption  - `'INSERT_ROWS'` (default) or `'OVERWRITE'`.
    * @returns The `AppendValuesResponse` with update metadata.
@@ -701,15 +703,20 @@ export class GoogleSpreadSheet {
   async appendData({
     sheetTitle,
     data,
-    valueInputOption = 'USER_ENTERED',
-    insertDataOption = 'INSERT_ROWS',
+    range,
+    valueInputOption = "USER_ENTERED",
+    insertDataOption = "INSERT_ROWS",
   }: AppendDataProps): Promise<
     GoogleSheetResponse<sheets_v4.Schema$AppendValuesResponse>
   > {
     try {
       const response = await this.google_sheets.spreadsheets.values.append({
         spreadsheetId: this.spreadsheetId,
-        range: sheetTitle,
+        range: sheetTitle.includes("!")
+          ? sheetTitle
+          : range
+            ? `${sheetTitle}!${range}`
+            : `${sheetTitle}!A1`,
         valueInputOption,
         insertDataOption,
         requestBody: { values: data },
@@ -753,7 +760,7 @@ export class GoogleSpreadSheet {
     sheetTitle,
     range,
     data,
-    valueInputOption = 'USER_ENTERED',
+    valueInputOption = "USER_ENTERED",
   }: UpdateRangeProps): Promise<
     GoogleSheetResponse<sheets_v4.Schema$UpdateValuesResponse>
   > {
@@ -851,7 +858,7 @@ export class GoogleSpreadSheet {
     );
     const sheetId = matchingSheet?.sheetId ?? undefined;
 
-    return this.deleteDimension(sheetId, 'ROWS', startIndex, endIndex);
+    return this.deleteDimension(sheetId, "ROWS", startIndex, endIndex);
   }
 
   /**
@@ -888,7 +895,7 @@ export class GoogleSpreadSheet {
     );
     const sheetId = matchingSheet?.sheetId ?? undefined;
 
-    return this.deleteDimension(sheetId, 'COLUMNS', startIndex, endIndex);
+    return this.deleteDimension(sheetId, "COLUMNS", startIndex, endIndex);
   }
 
   /**
@@ -897,7 +904,7 @@ export class GoogleSpreadSheet {
    */
   private async deleteDimension(
     sheetId: number | undefined,
-    dimension: 'ROWS' | 'COLUMNS',
+    dimension: "ROWS" | "COLUMNS",
     startIndex: number,
     endIndex: number,
   ): Promise<GoogleSheetResponse<void>> {
@@ -949,7 +956,7 @@ export class GoogleSpreadSheet {
     startIndex: number,
     endIndex: number,
   ): Promise<GoogleSheetResponse<void>> {
-    return this.insertDimension(sheetTitle, 'ROWS', startIndex, endIndex);
+    return this.insertDimension(sheetTitle, "ROWS", startIndex, endIndex);
   }
 
   /**
@@ -970,7 +977,7 @@ export class GoogleSpreadSheet {
     startIndex: number,
     endIndex: number,
   ): Promise<GoogleSheetResponse<void>> {
-    return this.insertDimension(sheetTitle, 'COLUMNS', startIndex, endIndex);
+    return this.insertDimension(sheetTitle, "COLUMNS", startIndex, endIndex);
   }
 
   /**
@@ -983,7 +990,7 @@ export class GoogleSpreadSheet {
    */
   private async insertDimension(
     sheetTitle: string,
-    dimension: 'ROWS' | 'COLUMNS',
+    dimension: "ROWS" | "COLUMNS",
     startIndex: number,
     endIndex: number,
   ): Promise<GoogleSheetResponse<void>> {
@@ -1079,10 +1086,7 @@ export class GoogleSpreadSheet {
 
       return { success: true, data: duplicated };
     } catch (error) {
-      return handleError(
-        `Error duplicating sheet with ID ${sheetId}.`,
-        error,
-      );
+      return handleError(`Error duplicating sheet with ID ${sheetId}.`, error);
     }
   }
 
@@ -1152,7 +1156,7 @@ export class GoogleSpreadSheet {
     sheetId: number,
     range: string,
   ): sheets_v4.Schema$GridRange {
-    const [startRef, endRef] = range.split(':');
+    const [startRef, endRef] = range.split(":");
 
     // Parse a single cell reference like "B2", "AA", or "5" into optional
     // column and row components.
@@ -1209,7 +1213,7 @@ export class GoogleSpreadSheet {
                 properties: { sheetId, hidden },
                 // The `fields` mask is mandatory: without it the API would
                 // overwrite all other sheet properties with zero values.
-                fields: 'hidden',
+                fields: "hidden",
               },
             },
           ],
@@ -1218,7 +1222,7 @@ export class GoogleSpreadSheet {
       return { success: true, data: undefined };
     } catch (error) {
       return handleError(
-        `Error ${hidden ? 'hiding' : 'showing'} sheet "${sheetTitle}".`,
+        `Error ${hidden ? "hiding" : "showing"} sheet "${sheetTitle}".`,
         error,
       );
     }
@@ -1232,7 +1236,7 @@ export class GoogleSpreadSheet {
    */
   private async _setDimensionPixelSize(
     sheetId: number,
-    dimension: 'COLUMNS' | 'ROWS',
+    dimension: "COLUMNS" | "ROWS",
     start: number,
     end: number,
     pixelSize: number,
@@ -1246,7 +1250,7 @@ export class GoogleSpreadSheet {
               updateDimensionProperties: {
                 range: { sheetId, dimension, startIndex: start, endIndex: end },
                 properties: { pixelSize },
-                fields: 'pixelSize',
+                fields: "pixelSize",
               },
             },
           ],
@@ -1296,7 +1300,7 @@ export class GoogleSpreadSheet {
       const response = await this.google_sheets.spreadsheets.values.batchGet({
         spreadsheetId: this.spreadsheetId,
         ranges: ranges.map((r) => `${sheetTitle}!${r}`),
-        valueRenderOption: valueRenderOption ?? 'FORMATTED_VALUE',
+        valueRenderOption: valueRenderOption ?? "FORMATTED_VALUE",
       });
 
       if (!response.data) {
@@ -1339,22 +1343,21 @@ export class GoogleSpreadSheet {
    */
   async batchUpdateRanges(
     props: BatchUpdateRangesProps,
-  ): Promise<
-    GoogleSheetResponse<sheets_v4.Schema$BatchUpdateValuesResponse>
-  > {
+  ): Promise<GoogleSheetResponse<sheets_v4.Schema$BatchUpdateValuesResponse>> {
     const { sheetTitle, entries, valueInputOption } = props;
     try {
-      const response =
-        await this.google_sheets.spreadsheets.values.batchUpdate({
+      const response = await this.google_sheets.spreadsheets.values.batchUpdate(
+        {
           spreadsheetId: this.spreadsheetId,
           requestBody: {
-            valueInputOption: valueInputOption ?? 'USER_ENTERED',
+            valueInputOption: valueInputOption ?? "USER_ENTERED",
             data: entries.map(({ range, data }) => ({
               range: `${sheetTitle}!${range}`,
               values: data,
             })),
           },
-        });
+        },
+      );
 
       if (!response.data) {
         return {
@@ -1394,13 +1397,12 @@ export class GoogleSpreadSheet {
   ): Promise<GoogleSheetResponse<sheets_v4.Schema$BatchClearValuesResponse>> {
     const { sheetTitle, ranges } = props;
     try {
-      const response =
-        await this.google_sheets.spreadsheets.values.batchClear({
-          spreadsheetId: this.spreadsheetId,
-          requestBody: {
-            ranges: ranges.map((r) => `${sheetTitle}!${r}`),
-          },
-        });
+      const response = await this.google_sheets.spreadsheets.values.batchClear({
+        spreadsheetId: this.spreadsheetId,
+        requestBody: {
+          ranges: ranges.map((r) => `${sheetTitle}!${r}`),
+        },
+      });
 
       if (!response.data) {
         return {
@@ -1531,7 +1533,7 @@ export class GoogleSpreadSheet {
             {
               updateSheetProperties: {
                 properties: { sheetId, title: newTitle },
-                fields: 'title',
+                fields: "title",
               },
             },
           ],
@@ -1605,7 +1607,7 @@ export class GoogleSpreadSheet {
             {
               updateSheetProperties: {
                 properties: { sheetId, index: newIndex },
-                fields: 'index',
+                fields: "index",
               },
             },
           ],
@@ -1663,9 +1665,7 @@ export class GoogleSpreadSheet {
                   range: { sheetId },
                   description,
                   warningOnly: warningOnly ?? false,
-                  editors: editorEmails
-                    ? { users: editorEmails }
-                    : undefined,
+                  editors: editorEmails ? { users: editorEmails } : undefined,
                 },
               },
             },
@@ -1716,7 +1716,7 @@ export class GoogleSpreadSheet {
     if (!idRes.success) return idRes;
     return this._setDimensionPixelSize(
       idRes.data,
-      'COLUMNS',
+      "COLUMNS",
       startColumnIndex,
       endColumnIndex,
       pixelSize,
@@ -1747,7 +1747,7 @@ export class GoogleSpreadSheet {
     if (!idRes.success) return idRes;
     return this._setDimensionPixelSize(
       idRes.data,
-      'ROWS',
+      "ROWS",
       startRowIndex,
       endRowIndex,
       pixelSize,
@@ -1786,7 +1786,7 @@ export class GoogleSpreadSheet {
               autoResizeDimensions: {
                 dimensions: {
                   sheetId,
-                  dimension: 'COLUMNS',
+                  dimension: "COLUMNS",
                   startIndex: startColumnIndex,
                   endIndex: endColumnIndex,
                 },
@@ -1825,11 +1825,7 @@ export class GoogleSpreadSheet {
   async freezeRowsAndColumns(
     props: FreezeProps,
   ): Promise<GoogleSheetResponse<void>> {
-    const {
-      sheetTitle,
-      frozenRowCount = 0,
-      frozenColumnCount = 0,
-    } = props;
+    const { sheetTitle, frozenRowCount = 0, frozenColumnCount = 0 } = props;
     const idRes = await this._getSheetId(sheetTitle);
     if (!idRes.success) return idRes;
     const sheetId = idRes.data;
@@ -1846,7 +1842,7 @@ export class GoogleSpreadSheet {
                   gridProperties: { frozenRowCount, frozenColumnCount },
                 },
                 fields:
-                  'gridProperties.frozenRowCount,gridProperties.frozenColumnCount',
+                  "gridProperties.frozenRowCount,gridProperties.frozenColumnCount",
               },
             },
           ],
@@ -1882,16 +1878,14 @@ export class GoogleSpreadSheet {
    * });
    * ```
    */
-  async mergeCells(
-    props: MergeCellsProps,
-  ): Promise<GoogleSheetResponse<void>> {
+  async mergeCells(props: MergeCellsProps): Promise<GoogleSheetResponse<void>> {
     const {
       sheetTitle,
       startRowIndex,
       endRowIndex,
       startColumnIndex,
       endColumnIndex,
-      mergeType = 'MERGE_ALL',
+      mergeType = "MERGE_ALL",
     } = props;
     const idRes = await this._getSheetId(sheetTitle);
     if (!idRes.success) return idRes;
@@ -1955,7 +1949,7 @@ export class GoogleSpreadSheet {
   async setCellFormat(
     props: CellFormatProps,
   ): Promise<GoogleSheetResponse<void>> {
-    const { sheetTitle, range, format, fields = '*' } = props;
+    const { sheetTitle, range, format, fields = "*" } = props;
     const idRes = await this._getSheetId(sheetTitle);
     if (!idRes.success) return idRes;
     const sheetId = idRes.data;
@@ -2068,8 +2062,8 @@ export class GoogleSpreadSheet {
     try {
       const response = await this.google_sheets.spreadsheets.values.get({
         spreadsheetId: this.spreadsheetId,
-        range: `${sheetTitle}!${range ?? 'A:Z'}`,
-        valueRenderOption: 'UNFORMATTED_VALUE',
+        range: `${sheetTitle}!${range ?? "A:Z"}`,
+        valueRenderOption: "UNFORMATTED_VALUE",
       });
 
       const values = response.data.values ?? [];
@@ -2087,7 +2081,7 @@ export class GoogleSpreadSheet {
         // Zip the header array with the row array. Missing trailing cells
         // default to an empty string to ensure every key is present.
         return Object.fromEntries(
-          headers.map((header, i) => [header, row[i] ?? '']),
+          headers.map((header, i) => [header, row[i] ?? ""]),
         ) as T;
       });
 
@@ -2132,7 +2126,7 @@ export class GoogleSpreadSheet {
       sourceRange,
       destinationRange,
       destinationSheetTitle,
-      pasteType = 'PASTE_NORMAL',
+      pasteType = "PASTE_NORMAL",
     } = props;
 
     const srcIdRes = await this._getSheetId(sheetTitle);
@@ -2194,9 +2188,7 @@ export class GoogleSpreadSheet {
    * });
    * ```
    */
-  async sortRange(
-    props: SortRangeProps,
-  ): Promise<GoogleSheetResponse<void>> {
+  async sortRange(props: SortRangeProps): Promise<GoogleSheetResponse<void>> {
     const { sheetTitle, range, sortSpecs } = props;
     const idRes = await this._getSheetId(sheetTitle);
     if (!idRes.success) return idRes;
@@ -2213,7 +2205,7 @@ export class GoogleSpreadSheet {
                 sortSpecs: sortSpecs.map(
                   ({ columnIndex, ascending = true }) => ({
                     dimensionIndex: columnIndex,
-                    sortOrder: ascending ? 'ASCENDING' : 'DESCENDING',
+                    sortOrder: ascending ? "ASCENDING" : "DESCENDING",
                   }),
                 ),
               },
@@ -2334,11 +2326,11 @@ export class GoogleSpreadSheet {
     try {
       const response = await this.google_sheets.spreadsheets.get({
         spreadsheetId: this.spreadsheetId,
-        fields: 'namedRanges',
+        fields: "namedRanges",
       });
       return { success: true, data: response.data.namedRanges ?? [] };
     } catch (error) {
-      return handleError('Error listing named ranges.', error);
+      return handleError("Error listing named ranges.", error);
     }
   }
 
@@ -2387,8 +2379,7 @@ export class GoogleSpreadSheet {
         },
       });
 
-      const namedRange =
-        response.data?.replies?.[0]?.addNamedRange?.namedRange;
+      const namedRange = response.data?.replies?.[0]?.addNamedRange?.namedRange;
       if (!namedRange) {
         return {
           success: false,
